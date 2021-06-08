@@ -90,4 +90,9 @@ class SalonController extends SamayGnawController
 		}
 	}
 
+	public function createGnaw($gnawData)
+	{
+		
+	}
+
 }

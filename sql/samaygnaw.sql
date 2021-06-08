@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Jun 07, 2021 at 11:38 AM
+-- Generation Time: Jun 08, 2021 at 09:22 AM
 -- Server version: 5.7.26
 -- PHP Version: 7.2.18
 
@@ -36,22 +36,20 @@ CREATE TABLE IF NOT EXISTS `clients` (
   `prenom` varchar(255) DEFAULT NULL,
   `tel` int(10) DEFAULT NULL,
   `genre` varchar(10) DEFAULT NULL,
-  `cou` decimal(4,1) DEFAULT NULL,
-  `epaule` decimal(4,1) DEFAULT NULL,
-  `poitrine` decimal(4,1) DEFAULT NULL,
-  `ceinture` decimal(4,1) DEFAULT NULL,
-  `tourBras` decimal(4,1) DEFAULT NULL,
-  `tourPoignet` decimal(4,1) DEFAULT NULL,
-  `longManche` decimal(4,1) DEFAULT NULL,
-  `longPant` decimal(4,1) DEFAULT NULL,
-  `longTaille` decimal(4,1) DEFAULT NULL,
-  `longCaftan` decimal(4,1) DEFAULT NULL,
-  `tourCuisse` decimal(4,1) DEFAULT NULL,
-  `tourCheville` decimal(4,1) DEFAULT NULL,
+  `cou` decimal(4,1) DEFAULT '0.0',
+  `epaule` decimal(4,1) DEFAULT '0.0',
+  `poitrine` decimal(4,1) DEFAULT '0.0',
+  `ceinture` decimal(4,1) DEFAULT '0.0',
+  `tourBras` decimal(4,1) DEFAULT '0.0',
+  `tourPoignet` decimal(4,1) DEFAULT '0.0',
+  `longManche` decimal(4,1) DEFAULT '0.0',
+  `longPant` decimal(4,1) DEFAULT '0.0',
+  `longTaille` decimal(4,1) DEFAULT '0.0',
+  `longCaftan` decimal(4,1) DEFAULT '0.0',
+  `tourCuisse` decimal(4,1) DEFAULT '0.0',
+  `tourCheville` decimal(4,1) DEFAULT '0.0',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-
--- --------------------------------------------------------
 
 --
 -- Table structure for table `gnaws`
@@ -63,11 +61,11 @@ CREATE TABLE IF NOT EXISTS `gnaws` (
   `sgi` varchar(255) NOT NULL,
   `prop` varchar(255) NOT NULL,
   `salon` varchar(255) NOT NULL,
-  `dateC` date DEFAULT NULL,
+  `dateC` datetime DEFAULT CURRENT_TIMESTAMP,
   `dateL` datetime DEFAULT NULL,
   `prix` int(10) DEFAULT NULL,
   `avance` int(10) DEFAULT '0',
-  `etat` varchar(100) DEFAULT NULL,
+  `etat` varchar(100) DEFAULT 'En cours',
   `type` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`,`sgi`,`prop`,`salon`),
   KEY `prop` (`prop`),
