@@ -10,11 +10,10 @@ class SamayGnawController
 
 	public function __construct()
 	{
-
-		self::_connect();
+		$this->_connect();  // so that i automatically connects to the db
 	}
 
-	private static function _connect() // so that i automatically connects to the db
+	private function _connect() 
 	{
 
 		$host = "localhost";
@@ -33,7 +32,7 @@ class SamayGnawController
 		}
 	}
 
-	protected function notify($type, $code, $message)
+	public static function notify($type, $code, $message)
 	{
 		if ($type == 'err') {
 			echo json_encode(array('STATUS' => 'Unexpected-Error', 'CODE' => $code, 'DESCRIPTION' => $message));
@@ -43,7 +42,7 @@ class SamayGnawController
 	}
 }
 
-class SalonController extends SamayGnawController
+class SalonController extends SamayGnawController // thanks to heritage, parent's constructor is implicitly called, the connection to db is automatic
 {
 
 	public function addClient($clientData)
@@ -70,8 +69,10 @@ class SalonController extends SamayGnawController
 		$_tourCheville = $clientData->tourCheville;
 
 		$query = "INSERT INTO 
-		clients(sgi, nom, prenom, tel, genre, cou, epaule, poitrine, ceinture, tourBras, tourPoignet, longManche, longPant, longTaille, longCaftan, tourCuisse, tourCheville)
-		VALUES('$_sgi', '$_lastName', '$_firstName', $_phone, '$_gender', $_cou, $_epaule, $_poitrine, $_ceinture, $_tourBras, $_tourPoignet, $_longManche, $_longPant, $_longTaille, $_longCaftan, $_tourCuisse, $_tourCheville)";
+		clients(sgi, nom, prenom, tel, genre, cou, epaule, poitrine, ceinture, tourBras, 
+		tourPoignet, longManche, longPant, longTaille, longCaftan, tourCuisse, tourCheville)
+		VALUES('$_sgi', '$_lastName', '$_firstName', $_phone, '$_gender', $_cou, $_epaule, $_poitrine, 
+		$_ceinture, $_tourBras, $_tourPoignet, $_longManche, $_longPant, $_longTaille, $_longCaftan, $_tourCuisse, $_tourCheville)";
 
 		try {
 
@@ -79,20 +80,51 @@ class SalonController extends SamayGnawController
 
 			if ($stmt->execute()) {
 
-				parent::notify("s", "NCSA", "The new user has been successfully added");
+				parent::notify("s", "NCSA", "The new client has been successfully added");
 			} else {
 				parent::notify("err", "UKN", "An unknown error has occured !");
 			}
-
 		} catch (Exception $e) {
 
 			parent::notify("err", "UNEX", "Due to an unexpected error, the operation can not proceed");
 		}
 	}
+}
 
-	public function createGnaw($gnawData)
+class ClientController extends SamayGnawController
+{
+
+	private $_sgi;
+
+	public function __construct($sgi)
 	{
-		
+		parent::__construct(); // here we need to explicitly called the parent constructor cause we declared a constructor for the child
+		$this->_sgi = $sgi;
 	}
 
+	public function measurements()
+	{
+
+		$query = "SELECT  
+		cou, epaule, poitrine, ceinture, tourBras, tourPoignet, longManche, 
+		longPant, longTaille, longCaftan, tourCuisse, tourCheville  
+		FROM clients WHERE sgi = '$this->_sgi'";
+
+		try {
+
+			$stmt = parent::$_sqlCon->prepare($query); // to fix !!
+
+			$stmt->execute();
+
+			$result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+			if ($result) {
+				echo json_encode($result);
+			} else {
+				parent::notify("s", "NMF", "No measurements found for this client");
+			}
+		} catch (Exception $e) {
+
+		}
+	}
 }
