@@ -10,10 +10,10 @@ class SamayGnawController
 
 	public function __construct()
 	{
-		$this->_connect();  // so that i automatically connects to the db
+		$this->_connect();  // so that it automatically connects to the db wehn the controller is inherited
 	}
 
-	private function _connect() 
+	private static function _connect()
 	{
 
 		$host = "localhost";
@@ -42,7 +42,100 @@ class SamayGnawController
 	}
 }
 
-class SalonController extends SamayGnawController // thanks to heritage, parent's constructor is implicitly called, the connection to db is automatic
+class AdminController extends SamayGnawController
+{
+
+	public function viewSaloons()
+	{
+		$query = "SELECT * FROM salons";
+
+		try {
+
+			$stmt = parent::$_sqlCon->prepare($query);
+
+			$stmt->execute();
+
+			$results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+			if ($results && $results !== null) {
+				echo json_encode($results);
+			} else {
+				parent::notify("s", "NSF", "No Saloons Found : The query returned an empty result");
+			}
+		} catch (Exception $e) {
+			parent::notify("err", "UNEX", "Due to an unexpected error, the operation can not proceed");
+		}
+	}
+
+	public function viewSaloon($sgi)
+	{
+
+		$query = "SELECT * FROM salons WHERE sgi = '$sgi'";
+
+		try {
+
+			$stmt = parent::$_sqlCon->prepare($query);
+
+			$stmt->execute();
+
+			$result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+			if ($result && $result !== null) {
+				echo json_encode($result);
+			} else {
+				parent::notify("s", "NSF", "No Saloon Found for the given sgi : The query returned an empty result");
+			}
+		} catch (Exception $e) {
+			parent::notify("err", "UNEX", "Due to an unexpected error, the operation can not proceed");
+		}
+	}
+
+	public function viewClients()
+	{
+		$query = "SELECT id, sgi, nom, prenom, tel, genre FROM clients";
+
+		try {
+
+			$stmt = parent::$_sqlCon->prepare($query);
+
+			$stmt->execute();
+
+			$results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+			if ($results && $results !== null) {
+				echo json_encode($results);
+			} else {
+				parent::notify("s", "NCF", "No Clients Found : The query returned an empty result");
+			}
+		} catch (Exception $e) {
+			parent::notify("err", "UNEX", "Due to an unexpected error, the operation can not proceed");
+		}
+	}
+
+	public function viewClient($sgi)
+	{
+		$query = "SELECT id, sgi, nom, prenom, tel, genre FROM clients WHERE sgi = '$sgi'";
+
+		try {
+
+			$stmt = self::$_sqlCon->prepare($query);
+
+			$stmt->execute();
+
+			$result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+			if ($result && $result !== null) {
+				echo json_encode($result);
+			} else {
+				self::notify("s", "NCF", "No Client Found for the given sgi : The query returned an empty result");
+			}
+		} catch (Exception $e) {
+			self::notify("err", "UNEX", "Due to an unexpected error, the operation can not proceed");
+		}
+	}
+}
+
+class SalonController extends SamayGnawController // thanks to heritage, parent's constructor is implicitly called, connection to db is then automatic
 {
 
 	public function addClient($clientData)
@@ -89,6 +182,32 @@ class SalonController extends SamayGnawController // thanks to heritage, parent'
 			parent::notify("err", "UNEX", "Due to an unexpected error, the operation can not proceed");
 		}
 	}
+
+	public function viewClient($sgi)
+	{
+
+		$query = "SELECT  
+		nom, prenom, cou, epaule, poitrine, ceinture, tourBras, tourPoignet, longManche, 
+		longPant, longTaille, longCaftan, tourCuisse, tourCheville  
+		FROM clients WHERE sgi = '$sgi'";
+
+		try {
+
+			$stmt = parent::$_sqlCon->prepare($query); // to fix !!
+
+			$stmt->execute();
+
+			$result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+			if ($result && $result !== null) {
+				echo json_encode($result);
+			} else {
+				parent::notify("s", "NMF", "No measurements found for this client");
+			}
+		} catch (Exception $e) {
+			parent::notify("err", "UNEX", "Due to an unexpected error, the operation can not proceed");
+		}
+	}
 }
 
 class ClientController extends SamayGnawController
@@ -118,13 +237,13 @@ class ClientController extends SamayGnawController
 
 			$result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-			if ($result) {
+			if ($result && $result !== null) {
 				echo json_encode($result);
 			} else {
 				parent::notify("s", "NMF", "No measurements found for this client");
 			}
 		} catch (Exception $e) {
-
+			parent::notify("err", "UNEX", "Due to an unexpected error, the operation can not proceed");
 		}
 	}
 }
