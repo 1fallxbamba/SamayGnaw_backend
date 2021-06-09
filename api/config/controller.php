@@ -90,9 +90,43 @@ class SalonController extends SamayGnawController
 		}
 	}
 
+
+
+
+
+
+
 	public function createGnaw($gnawData)
 	{
+		//Add if there is something missing !
+		$_idGnaw = $gnawData->idGnaw;
+		$_etat = $gnawData->etat;
+		$_dateDebut = $gnawData->dateDebut;
+		$_dateFin = $gnawData->dateFin;
+		$_typeGnaw = $gnawData->typeGnaw;
+
+		//Foreign key
+		$_sgi = $gnawData->sgi;
 		
+		$query = "INSERT INTO gnaws(idGnaw, etat, dateDebut, dateFin, typeGnaw)
+		VALUES('$_idGnaw', '$_etat', '$_dateDebut', '$_dateFin', '$_typeGnaw')";
+
+		try {
+
+			$stmt = parent::$_sqlCon->prepare($query);
+
+			if ($stmt->execute()) {
+
+				parent::notify("s", "NCSA", "The new Gnaw has been successfully added");
+			} else {
+				parent::notify("err", "UKN", "An unknown error has occured !");
+			}
+
+		} catch (Exception $e) {
+
+			parent::notify("err", "UNEX", "Due to an unexpected error, the operation can not proceed");
+		}
+
 	}
 
 }
