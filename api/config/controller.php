@@ -89,7 +89,91 @@ class SalonController extends SamayGnawController // thanks to heritage, parent'
 			parent::notify("err", "UNEX", "Due to an unexpected error, the operation can not proceed");
 		}
 	}
-}
+
+			//function addgnaw
+
+	public function addgnaw($gnawData) 
+	{
+		//informations
+
+		$_sgi = $gnawData->sgi;
+		$_prop = $gnawData->prop;
+
+		//détails 
+		$_salon = $gnawData->salon;
+		$_dateL = $gnawData->dateL;
+		$_prix = $gnawData->prix;
+		$_avance = $gnawData->avance;
+		$_type = $gnawData->type;
+
+
+		
+		$query = "INSERT INTO 
+		gnaws(sgi, prop, salon, dateL, prix, avance, type )
+		VALUES('$_sgi','$_prop', '$_salon', '$_dateL', $_prix, $_avance, '$_type')";
+
+		try {
+
+			$stmt = parent::$_sqlCon->prepare($query);
+
+			if ($stmt->execute()) {
+
+				parent::notify("ok", "welcome", "The new gnaw has been successfully added");
+			} else {
+				parent::notify("error", "unknown", "An unknown error has occured !");
+			}
+
+		} catch (Exception $e) {
+
+			parent::notify("error", "problem", "Due to an unexpected error, the operation can not proceed");
+		}
+        
+	}
+
+}			//function  update gnaw
+
+	public function updategnaw() {
+
+				$sql = "UPDATE gnaws . $this->_sgi .  SET sgi = :sgi, dateL = :dateL, avance = :avance, etat = :etat WHERE sgi = :sgi";
+			
+				
+				// On sécurise les données
+				$this->sgi=htmlspecialchars(strip_tags($this->sgi));
+				$this->dateL=htmlspecialchars(strip_tags($this->dateL));
+				$this->avance=htmlspecialchars(strip_tags($this->avance));
+				$this->etat=htmlspecialchars(strip_tags($this->etat));
+
+				// On attache les variables
+				$query->bindParam(':dateL', $this->dateL);
+				$query->bindParam(':prix', $this->avance);
+				$query->bindParam(':etat', $this->etat);;
+				$query->bindParam(':sgi', $this->sgi);
+				
+				// On exécute
+					
+				
+				try {
+		
+					$stmt = parent::$_sqlCon->prepare($query);
+		
+					if ($stmt->execute()) {
+		
+						parent::notify("ok", "welcome","you have updated ");
+					} else {
+						parent::notify("error", "unknown", "An unknown error has occured !");
+					}
+		
+					} catch (Exception $e) {
+		
+						parent::notify("error", "problem", "Due to an unexpected error, the operation can not proceed");
+					}
+				
+	}
+				
+			}
+		
+
+	}
 
 class ClientController extends SamayGnawController
 {
@@ -127,4 +211,36 @@ class ClientController extends SamayGnawController
 
 		}
 	}
+
+	
+	//function consult gnaw
+
+	public function consultgnaw() {
+
+
+		
+		$query = "SELECT sgi, prop, salon, dateL, avance  FROM gnaws WHERE sgi = '$this->_sgi'";
+
+		try {
+
+			$stmt = parent::$_sqlCon->prepare($query); // to fix !!
+
+			$stmt->execute();
+
+			$result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+			if ($result) {
+				echo json_encode($result);
+			} else {
+				parent::notify("s", "NMF", "No measurements found for this client");
+			}
+		} catch (Exception $e) {
+
+		}
+    
+	}
+
+
+
+
 }
