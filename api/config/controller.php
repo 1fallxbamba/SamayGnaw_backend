@@ -135,6 +135,11 @@ class AdminController extends SamayGnawController
 			self::notify("uerr", "UNEX", "Due to an unexpected error, the operation can not proceed");
 		}
 	}
+
+	public function approveRegistration()
+	{
+		
+	}
 }
 
 class SalonController extends SamayGnawController // thanks to heritage, parent's constructor is implicitly called, connection to db is then automatic
@@ -235,7 +240,6 @@ class SalonController extends SamayGnawController // thanks to heritage, parent'
 		}
 	}
 
-	//function addgnaw
 	public function addGnaw($gnawData)
 	{
 		//informations
@@ -264,7 +268,6 @@ class SalonController extends SamayGnawController // thanks to heritage, parent'
 		}
 	}
 
-	// function update gnaw
 	public function updateGnaw($newGnawData)
 	{
 
