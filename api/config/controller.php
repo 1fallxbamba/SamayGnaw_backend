@@ -69,11 +69,17 @@ class SalonController extends SamayGnawController // thanks to heritage, parent'
 		$_tourCheville = $clientData->tourCheville;
 
 		$query = "INSERT INTO 
+<<<<<<< HEAD
 		clients(sgi, nom, prenom, tel, genre, cou, epaule, poitrine, ceinture, tourBras, 
 		tourPoignet, longManche, longPant, longTaille, longCaftan, tourCuisse, tourCheville)
 		VALUES('$_sgi', '$_lastName', '$_firstName', $_phone, '$_gender', $_cou, $_epaule, $_poitrine, 
 		$_ceinture, $_tourBras, $_tourPoignet, $_longManche, $_longPant, $_longTaille, $_longCaftan, $_tourCuisse, $_tourCheville)";
 
+=======
+		clients(sgi, nom, prenom, tel, genre, cou, epaule, poitrine, ceinture, tourBras, tourPoignet, longManche, longPant, longTaille, longCaftan, tourCuisse, tourCheville)
+		VALUES('$_sgi', '$_lastName', '$_firstName', $_phone, '$_gender', $_cou, $_epaule, $_poitrine, $_ceinture, $_tourBras, $_tourPoignet, $_longManche, $_longPant, $_longTaille, $_longCaftan, $_tourCuisse, $_tourCheville)";
+              
+>>>>>>> 91269f8963800630f528f962ffeb1ea464657900
 		try {
 
 			$stmt = parent::$_sqlCon->prepare($query);
@@ -90,7 +96,11 @@ class SalonController extends SamayGnawController // thanks to heritage, parent'
 		}
 	}
 
+<<<<<<< HEAD
 			//function addgnaw
+=======
+	//function addgnaw
+>>>>>>> 91269f8963800630f528f962ffeb1ea464657900
 
 	public function addgnaw($gnawData) 
 	{
@@ -110,7 +120,11 @@ class SalonController extends SamayGnawController // thanks to heritage, parent'
 		
 		$query = "INSERT INTO 
 		gnaws(sgi, prop, salon, dateL, prix, avance, type )
+<<<<<<< HEAD
 		VALUES('$_sgi','$_prop', '$_salon', '$_dateL', $_prix, $_avance, '$_type')";
+=======
+		VALUES('$_sgi','$prop', '$_salon', '$_dateL', $_prix, $_avance, $_type)";
+>>>>>>> 91269f8963800630f528f962ffeb1ea464657900
 
 		try {
 
@@ -130,6 +144,7 @@ class SalonController extends SamayGnawController // thanks to heritage, parent'
         
 	}
 
+<<<<<<< HEAD
 }			//function  update gnaw
 
 	public function updategnaw() {
@@ -242,5 +257,88 @@ class ClientController extends SamayGnawController
 
 
 
+=======
+	//function consult gnaw
+
+	public function consultgnaw($consult) {
+
+
+		$_sgi = $consult->sgi;
+		$_prop = $consult->prop;
+
+		$_salon = $consult->salon;
+		$_dateL = $consult->dateL;
+		$_avance = $consult->avance;
+
+
+		
+		$query = "SELECT (sgi, prop, salon, dateL, avance ) FROM gnaws
+		VALUES('$_sgi','$prop', '$_salon', '$_dateL', $_avance,)";
+
+		try {
+
+			$stmt = parent::$_sqlCon->prepare($query);
+
+			if ($stmt->execute()) {
+
+				parent::notify("ok", "welcome");
+			} else {
+				parent::notify("error", "unknown", "An unknown error has occured !");
+			}
+
+		} catch (Exception $e) {
+
+			parent::notify("error", "problem", "Due to an unexpected error, the operation can not proceed");
+		}
+        
+	}
+
+		//function  update gnaw
+
+	public function updategnaw($updatgnaw) {
+
+		$_id = $updatgnaw->id;
+		$_sgi = $updatgnaw->sgi;
+		$_prop = $updatgnaw->prop;
+
+		$_salon = $updatgnaw->salon;
+		$_dateL = $updatgnaw->dateL;
+		$_avance = $updatgnaw->avance;
+		$_etat = $updatgnaw->etat;
+
+				
+		$sql = "UPDATE gnaws SET  sgi = ?, prop = ?, dateL = ?, avance = ?, etat = ? WHERE id = ?");
+       
+
+		$query->bindValue(':sgi', $_sgi, PDO::PARAM_STR);
+		$query->bindValue(':prop', $_prop, PDO::PARAM_STR);
+		$query->bindValue(':dateL', $_dateL, PDO::PARAM_INT);
+		$query->bindValue(':avance', $_avance, PDO::PARAM_INT);
+		$query->bindValue(':etat', $_etat, PDO::PARAM_INT);
+
+		$query->execute();
+
+		try {
+
+			$stmt = parent::$_sqlCon->prepare($query);
+
+			if ($stmt->execute()) {
+
+				parent::notify("ok", "welcome","you have updated ");
+			} else {
+				parent::notify("error", "unknown", "An unknown error has occured !");
+			}
+
+			} catch (Exception $e) {
+
+				parent::notify("error", "problem", "Due to an unexpected error, the operation can not proceed");
+			}
+        
+
+		
+	}
+
+	
+>>>>>>> 91269f8963800630f528f962ffeb1ea464657900
 
 }
