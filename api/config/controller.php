@@ -34,8 +34,10 @@ class SamayGnawController
 
 	public static function notify($type, $code, $message)
 	{
-		if ($type == 'err') {
+		if ($type == 'uerr') {
 			echo json_encode(array('STATUS' => 'Unexpected-Error', 'CODE' => $code, 'DESCRIPTION' => $message));
+		} elseif ($type == 'err') {
+			echo json_encode(array('STATUS' => 'Request-Error', 'CODE' => $code, 'DESCRIPTION' => $message));
 		} else {
 			echo json_encode(array('STATUS' => 'Success', 'CODE' => $code, 'MESSAGE' => $message));
 		}
@@ -63,7 +65,7 @@ class AdminController extends SamayGnawController
 				parent::notify("s", "NSF", "No Saloons Found : The query returned an empty result");
 			}
 		} catch (Exception $e) {
-			parent::notify("err", "UNEX", "Due to an unexpected error, the operation can not proceed");
+			parent::notify("uerr", "UNEX", "Due to an unexpected error, the operation can not proceed");
 		}
 	}
 
@@ -86,7 +88,7 @@ class AdminController extends SamayGnawController
 				parent::notify("s", "NSF", "No Saloon Found for the given sgi : The query returned an empty result");
 			}
 		} catch (Exception $e) {
-			parent::notify("err", "UNEX", "Due to an unexpected error, the operation can not proceed");
+			parent::notify("uerr", "UNEX", "Due to an unexpected error, the operation can not proceed");
 		}
 	}
 
@@ -108,7 +110,7 @@ class AdminController extends SamayGnawController
 				parent::notify("s", "NCF", "No Clients Found : The query returned an empty result");
 			}
 		} catch (Exception $e) {
-			parent::notify("err", "UNEX", "Due to an unexpected error, the operation can not proceed");
+			parent::notify("uerr", "UNEX", "Due to an unexpected error, the operation can not proceed");
 		}
 	}
 
@@ -130,7 +132,7 @@ class AdminController extends SamayGnawController
 				self::notify("s", "NCF", "No Client Found for the given sgi : The query returned an empty result");
 			}
 		} catch (Exception $e) {
-			self::notify("err", "UNEX", "Due to an unexpected error, the operation can not proceed");
+			self::notify("uerr", "UNEX", "Due to an unexpected error, the operation can not proceed");
 		}
 	}
 }
@@ -175,11 +177,11 @@ class SalonController extends SamayGnawController // thanks to heritage, parent'
 
 				parent::notify("s", "NCSA", "The new client has been successfully added");
 			} else {
-				parent::notify("err", "UKN", "An unknown error has occured !");
+				parent::notify("uerr", "UNEX", "An unexpected error has occured !");
 			}
 		} catch (Exception $e) {
 
-			parent::notify("err", "UNEX", "Due to an unexpected error, the operation can not proceed");
+			parent::notify("uerr", "UNEX", "Due to an unexpected error, the operation can not proceed");
 		}
 	}
 
@@ -205,10 +207,93 @@ class SalonController extends SamayGnawController // thanks to heritage, parent'
 				parent::notify("s", "NMF", "No measurements found for this client");
 			}
 		} catch (Exception $e) {
-			parent::notify("err", "UNEX", "Due to an unexpected error, the operation can not proceed");
+			parent::notify("uerr", "UNEX", "Due to an unexpected error, the operation can not proceed");
+		}
+	}
+
+
+	public function viewGnaws($sgi)
+	{
+
+		$query = "SELECT prop, dateC, dateL, prix, avance, etat, type FROM gnaws WHERE salon = '$sgi'";
+
+		try {
+
+			$stmt = parent::$_sqlCon->prepare($query);
+
+			$stmt->execute();
+
+			$result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+			if ($result && $result !== null) {
+				echo json_encode($result);
+			} else {
+				parent::notify("s", "NGF", "No Gnaw Found for the given sgi : The query returned an empty result");
+			}
+		} catch (Exception $e) {
+			parent::notify("uerr", "UNEX", "Due to an unexpected error, the operation can not proceed");
+		}
+	}
+
+	//function addgnaw
+	public function addGnaw($gnawData)
+	{
+		//informations
+		$_sgi = $gnawData->sgi;
+		$_prop = $gnawData->prop;
+		$_saloon = $gnawData->saloon;
+		$_dateL = $gnawData->dateL;
+		$_prix = $gnawData->prix;
+		$_avance = $gnawData->avance;
+		$_type = $gnawData->type;
+
+		$query = "INSERT INTO gnaws(sgi, prop, salon, dateL, prix, avance, type ) 
+		VALUES('$_sgi','$_prop', '$_saloon', '$_dateL', $_prix, $_avance, '$_type')";
+
+		try {
+
+			$stmt = parent::$_sqlCon->prepare($query);
+
+			if ($stmt->execute()) {
+				parent::notify("s", "NGSA", "The New Gnaw has been Successfully Added");
+			} else {
+				parent::notify("uerr", "UNEX", "An unexpected error has occured !");
+			}
+		} catch (Exception $e) {
+			parent::notify("uerr", "UNEX", "Due to an unexpected error, the operation can not proceed");
+		}
+	}
+
+	// function update gnaw
+	public function updateGnaw($newGnawData)
+	{
+
+		$_sgi = $newGnawData->sgi;
+		$_dateL = $newGnawData->dateL;
+		$_avance = $newGnawData->avance;
+		$_etat = $newGnawData->etat;
+
+		$query = "UPDATE gnaws SET dateL = '$_dateL', avance = $_avance, etat = '$_etat' WHERE sgi = '$_sgi'";
+
+		try {
+
+			$stmt = parent::$_sqlCon->prepare($query);
+
+			if ($stmt->execute()) {
+				if ($stmt->rowCount() == 0) {
+					parent::notify("err", "SDNE", "The given Sgi Does Not Exist !");
+				} else {
+					parent::notify("s", "GUS", "The Gnaw has been Updated Successfully");
+				}
+			} else {
+				parent::notify("uerr", "UNEX", "An unexpected error has occured !");
+			}
+		} catch (Exception $e) {
+			parent::notify("uerr", "UNEX", "Due to an unexpected error, the operation can not proceed");
 		}
 	}
 }
+
 
 class ClientController extends SamayGnawController
 {
@@ -243,7 +328,7 @@ class ClientController extends SamayGnawController
 				parent::notify("s", "NMF", "No measurements found for this client");
 			}
 		} catch (Exception $e) {
-			parent::notify("err", "UNEX", "Due to an unexpected error, the operation can not proceed");
+			parent::notify("uerr", "UNEX", "Due to an unexpected error, the operation can not proceed");
 		}
 	}
 }
