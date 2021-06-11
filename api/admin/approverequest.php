@@ -9,7 +9,6 @@ include '../config/controller.php';
 
 $_data = file_get_contents("php://input");
 
-// Decoding it into an object
 $requestData = json_decode($_data);
 
 try {
@@ -19,7 +18,7 @@ try {
 	$admin->approveRequest($requestData);
 
 } catch (Exception $e) {
-	SamayGnawController::notify("err", "UNEX", "Due to an unexpected error the requested operation can not be processed");
+	SamayGnawController::notify("uerr", "UNEX", "Due to an unexpected error the requested operation can not be processed");
 }
 
 

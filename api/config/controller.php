@@ -35,14 +35,14 @@ class SamayGnawController
 	public static function notify($type, $code, $message, $data = null)
 	{
 		if ($type == 'uerr') {
-			echo json_encode(array('STATUS' => 'Unexpected-Error', 'CODE' => $code, 'DESCRIPTION' => $message));
+			echo json_encode(array('RESPONSE' => 'Unexpected-Error', 'CODE' => $code, 'DESCRIPTION' => $message));
 		} elseif ($type == 'err') {
-			echo json_encode(array('STATUS' => 'Request-Error', 'CODE' => $code, 'DESCRIPTION' => $message));
+			echo json_encode(array('RESPONSE' => 'Request-Error', 'CODE' => $code, 'DESCRIPTION' => $message));
 		} else {
 			if ($data == null) {
-				echo json_encode(array('STATUS' => 'Success', 'CODE' => $code, 'MESSAGE' => $message));
+				echo json_encode(array('RESPONSE' => 'Success', 'CODE' => $code, 'MESSAGE' => $message));
 			} else {
-				echo json_encode(array('STATUS' => 'Success', 'CODE' => $code, 'MESSAGE' => $message, 'DATA' => $data));
+				echo json_encode(array('RESPONSE' => 'Success', 'CODE' => $code, 'MESSAGE' => $message, 'DATA' => $data));
 			}
 		}
 	}
@@ -241,7 +241,7 @@ class AdminController extends SamayGnawController
 		}
 	}
 
-	private function updateRequestStatus($id)
+	private function updateRequestRESPONSE($id)
 	{
 		$query = "UPDATE requests SET statut = 'Approved' WHERE id = $id";
 
@@ -267,10 +267,10 @@ class AdminController extends SamayGnawController
 		try {
 			if ($this->addUser($sgi, $_shadow)) {
 				if ($this->addSaloon($sgi, $_name, $_address, $_phone, $_email)) {
-					if ($this->updateRequestStatus($_id)) {
+					if ($this->updateRequestRESPONSE($_id)) {
 						parent::notify("s", "RAS", "The registration Request has been Approved Successfully");
 					} else {
-						parent::notify("uerr", "UNEX", "An unexpected error has occured, the request status could not be updated to 'Approved' !");
+						parent::notify("uerr", "UNEX", "An unexpected error has occured, the request RESPONSE could not be updated to 'Approved' !");
 					}
 				} else {
 					parent::notify("uerr", "UNEX", "An unexpected error has occured, the new saloon could not be added !");
@@ -315,10 +315,38 @@ class SalonController extends SamayGnawController // thanks to heritage, parent'
 		}
 	}
 
-	// public function login($credentials)
-	// {
+	public function login($credentials)
+	{
 
-	// }
+		$_login = $credentials->login;
+		$_pwd = $credentials->pwd;
+
+		$query = "SELECT id, shadow FROM users WHERE login = '$_login'";
+
+		try {
+
+			$stmt = parent::$_sqlCon->prepare($query);
+
+			$stmt->execute();
+
+			$result = $stmt->fetch(PDO::FETCH_ASSOC); // retrieves the id and shadow of the given 'login'
+
+			if ($result && $stmt->rowCount() !== 0) {  // if the login exists in the database
+
+				$fetchedPwd = $result['shadow'];
+
+				if (password_verify($_pwd, $fetchedPwd)) { // then check if the password is correct
+					parent::notify("s", "USA", "The User is Successfully Authentified");
+				} else {
+					parent::notify("err", "WPWD", "Wrong Password : The entered password is incorrect ");
+				}
+			} else { // if the result is emppty (===> rowCount = 0), then the requested login does not exsit in the database
+				parent::notify("err", "UDNE", "User Does Not Exist : the given login does not exist in the records ");
+			}
+		} catch (Exception $e) {
+			parent::notify("uerr", "UNEX", "Due to an unexpected error, the operation can not proceed");
+		}
+	}
 
 	public function addClient($clientData)
 	{
