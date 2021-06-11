@@ -241,7 +241,7 @@ class AdminController extends SamayGnawController
 		}
 	}
 
-	private function updateRequestRESPONSE($id)
+	private function updateRequestStatus($id)
 	{
 		$query = "UPDATE requests SET statut = 'Approved' WHERE id = $id";
 
@@ -267,10 +267,10 @@ class AdminController extends SamayGnawController
 		try {
 			if ($this->addUser($sgi, $_shadow)) {
 				if ($this->addSaloon($sgi, $_name, $_address, $_phone, $_email)) {
-					if ($this->updateRequestRESPONSE($_id)) {
+					if ($this->updateRequestStatus($_id)) {
 						parent::notify("s", "RAS", "The registration Request has been Approved Successfully");
 					} else {
-						parent::notify("uerr", "UNEX", "An unexpected error has occured, the request RESPONSE could not be updated to 'Approved' !");
+						parent::notify("uerr", "UNEX", "An unexpected error has occured, the request status could not be updated to 'Approved' !");
 					}
 				} else {
 					parent::notify("uerr", "UNEX", "An unexpected error has occured, the new saloon could not be added !");
