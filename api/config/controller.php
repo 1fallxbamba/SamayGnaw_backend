@@ -138,12 +138,39 @@ class AdminController extends SamayGnawController
 
 	public function approveRegistration()
 	{
-		
 	}
 }
 
 class SalonController extends SamayGnawController // thanks to heritage, parent's constructor is implicitly called, connection to db is then automatic
 {
+
+	public function requestAccount($accountData)
+	{
+		//informations
+		$_name = $accountData->name;
+		$_address = $accountData->address;
+		$_phone = $accountData->phone;
+		$_email = $accountData->email;
+		$password = $accountData->pwd;
+
+		$_shadow = password_hash($password, PASSWORD_DEFAULT);
+
+		$query = "INSERT INTO requests(nom, adresse, tel, email, shadow) 
+		VALUES('$_name','$_address', $_phone, '$_email', '$_shadow')";
+
+		try {
+
+			$stmt = parent::$_sqlCon->prepare($query);
+
+			if ($stmt->execute()) {
+				parent::notify("s", "NRSS", "The New Request has been Successfully Sent");
+			} else {
+				parent::notify("uerr", "UNEX", "An unexpected error has occured !");
+			}
+		} catch (Exception $e) {
+			parent::notify("uerr", "UNEX", "Due to an unexpected error, the operation can not proceed");
+		}
+	}
 
 	public function addClient($clientData)
 	{
@@ -216,7 +243,6 @@ class SalonController extends SamayGnawController // thanks to heritage, parent'
 		}
 	}
 
-
 	public function viewGnaws($sgi)
 	{
 
@@ -247,12 +273,12 @@ class SalonController extends SamayGnawController // thanks to heritage, parent'
 		$_prop = $gnawData->prop;
 		$_saloon = $gnawData->saloon;
 		$_dateL = $gnawData->dateL;
-		$_prix = $gnawData->prix;
+		$_price = $gnawData->price;
 		$_avance = $gnawData->avance;
 		$_type = $gnawData->type;
 
 		$query = "INSERT INTO gnaws(sgi, prop, salon, dateL, prix, avance, type ) 
-		VALUES('$_sgi','$_prop', '$_saloon', '$_dateL', $_prix, $_avance, '$_type')";
+		VALUES('$_sgi','$_prop', '$_saloon', '$_dateL', $_price, $_avance, '$_type')";
 
 		try {
 
