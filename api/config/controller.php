@@ -315,10 +315,10 @@ class SalonController extends SamayGnawController // thanks to heritage, parent'
 		}
 	}
 
-	// public function login($credentials)
-	// {
-
-	// }
+	public function login($credentials)
+	{
+		/// aythia aythia
+	}
 
 	public function addClient($clientData)
 	{

@@ -1,20 +1,25 @@
 <?php
 
-// will serve after deployment
+// This will serve after deployment
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Headers: *');
 header('Access-Control-Allow-Methods: *');
 
+include '../../../config/controller.php';
 
-include '../config/controller.php';
+$_data = file_get_contents("php://input");
 
-$sgi = isset($_GET['sgi']) ? $_GET['sgi'] : die('ERROR: No SGI provided');
+$credentials = json_decode($_data);
 
 try {
-	$admin = new AdminController();
-	$admin->viewClient($sgi);
+
+	$salon = new SalonController();
+
+	$salon->login($credentials);
+
 } catch (Exception $e) {
 	SamayGnawController::notify("uerr", "UNEX", "Due to an unexpected error the requested operation can not be processed");
 }
+
 
 ?>

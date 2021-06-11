@@ -14,7 +14,7 @@ try {
 	$salon = new SalonController();
 	$salon->viewClient($sgi);
 } catch (Exception $e) {
-	SamayGnawController::notify("err", "UNEX", "Due to an unexpected error the requested operation can not be processed");
+	SamayGnawController::notify("uerr", "UNEX", "Due to an unexpected error the requested operation can not be processed");
 }
 
 ?>
