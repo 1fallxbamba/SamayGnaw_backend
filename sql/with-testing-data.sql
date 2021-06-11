@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Jun 10, 2021 at 06:25 PM
+-- Generation Time: Jun 11, 2021 at 07:53 AM
 -- Server version: 5.7.26
 -- PHP Version: 7.2.18
 
@@ -108,6 +108,7 @@ CREATE TABLE IF NOT EXISTS `requests` (
   `adresse` varchar(255) DEFAULT NULL,
   `tel` int(10) DEFAULT NULL,
   `email` varchar(255) DEFAULT NULL,
+  `shadow` varchar(255) NOT NULL,
   `statut` varchar(50) DEFAULT 'Pending',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
