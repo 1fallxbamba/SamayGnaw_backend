@@ -5,20 +5,18 @@ header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Headers: *');
 header('Access-Control-Allow-Methods: *');
 
-// Include the main controller
-include '../../../config/controller.php';
+include '../config/controller.php';
 
-// Get the posted data
 $_data = file_get_contents("php://input");
 
 // Decoding it into an object
-$clientData = json_decode($_data);
+$requestData = json_decode($_data);
 
 try {
 
-	$salon = new SalonController();
+	$admin = new AdminController();
 
-	$salon->addClient($clientData);
+	$admin->approveRequest($requestData);
 
 } catch (Exception $e) {
 	SamayGnawController::notify("err", "UNEX", "Due to an unexpected error the requested operation can not be processed");
