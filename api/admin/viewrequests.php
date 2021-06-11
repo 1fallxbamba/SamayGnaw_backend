@@ -6,13 +6,15 @@ header('Access-Control-Allow-Headers: *');
 header('Access-Control-Allow-Methods: *');
 
 
-include '../../../config/controller.php';
+include '../config/controller.php';
 
-$sgi = isset($_GET['sgi']) ? $_GET['sgi'] : die('ERROR: No SGI provided');
 
 try {
-	$salon = new SalonController();
-	$salon->viewClient($sgi);
+
+	$admin = new AdminController();
+
+	$admin->viewRequests();
+
 } catch (Exception $e) {
 	SamayGnawController::notify("err", "UNEX", "Due to an unexpected error the requested operation can not be processed");
 }
