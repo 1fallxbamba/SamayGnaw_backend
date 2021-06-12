@@ -8,7 +8,7 @@ header('Access-Control-Allow-Methods: *');
 
 include '../../../config/controller.php';
 
-$saloonSGI = isset($_GET['ssgi']) ? $_GET['ssgi'] : die(json_encode(array('ERROR' => 'No Saloon SGI provided')));
+$saloonSGI = isset($_GET['sgi']) ? $_GET['sgi'] : die(json_encode(array('ERROR' => 'No Saloon SGI provided')));
 
 try {
 	$salon = new SalonController();
