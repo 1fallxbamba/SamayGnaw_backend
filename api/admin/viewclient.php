@@ -8,7 +8,7 @@ header('Access-Control-Allow-Methods: *');
 
 include '../config/controller.php';
 
-$sgi = isset($_GET['sgi']) ? $_GET['sgi'] : die('ERROR: No SGI provided');
+$sgi = isset($_GET['sgi']) ? $_GET['sgi'] : die(json_encode(array('ERROR' => 'No Client SGI provided')));
 
 try {
 	$admin = new AdminController();

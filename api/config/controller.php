@@ -47,14 +47,21 @@ class SamayGnawController
 		}
 	}
 
-	// An SGI : SamayGnawIdentifier is a unique identifier used by us to identify the users
+	/* An SGI : SamayGnawIdentifier is a unique identifier used by us to identify the users
+	We have 3 types : SGG (SamayGnaw Gnaw) used for Gnaws, SGC (SamayGnaw Client) for Clients and SGS (SamayGnaw Saloon) for Saloons
+	*/
 	protected function generateSGI($type, $phone = null)
 	{
 		$sgi = "";
 
-		if ($type == "SGG") { // SGG = SamayGnawGnaw, used for a Gnaw. This SGI is formed by the string SGG + (the id of the latest inserted gnaw + 1)
+		$table = $type == "SGG" ? "gnaws" : "clients";
 
-			$query = "SELECT id FROM gnaws ORDER BY ID DESC LIMIT 1";
+		/* SGG and SGC are formed by  : the string 'SGG'/'SGC' + ((id of the latest inserted gnaw) + 1) +  a random number between 1 and 255
+		Example : SGG4-54 SGC2-239
+		*/
+		if ($type == "SGG" || $type == "SGC") {
+
+			$query = "SELECT id FROM $table ORDER BY id DESC LIMIT 1";
 
 			try {
 
@@ -64,12 +71,15 @@ class SamayGnawController
 
 				$result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-				$latestID = ($result['id']);
-				$sgi = "SGG" . strval(((int)$latestID) + 1);
+				$latestID = $result['id'];
+				$sgi = $type . strval(((int)$latestID) + 1) . '-' . strval(rand(1, 255));
 			} catch (Exception $e) {
 				self::notify("uerr", "UNEX", "Due to an unexpected error, the SGI creation failed");
 			}
-		} else { // Other SGIs : SGS/SGC (SamayGnawSaloon/SamayGnawClient) are formed by the string defining them mixed with their phone number and a randomly generated number
+			/*
+			SGS is formed by the string 'SGS' mixed with the phone number of the saloon and a randomly generated number between 1 and 999
+			*/
+		} else {
 			$num = strval($phone);
 			$sgi = $num[0] . $num[1] . "$type-" . $num[2] . $num[3] . $num[4] . $num[5] . rand(1, 999) . $num[6] . $num[7] . $num[8];
 		}
