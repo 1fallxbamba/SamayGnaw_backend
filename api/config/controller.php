@@ -101,10 +101,10 @@ class AdminController extends SamayGnawController
 
 			$stmt->execute();
 
-			$results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+			$result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-			if ($results && $results !== null) {
-				echo json_encode($results);
+			if ($result && $result !== null) {
+				parent::notify("s", "RFS", "Requests' data Fetched Successfully", json_encode($result));
 			} else {
 				parent::notify("s", "NRF", "No Requests Found : The query returned an empty result");
 			}
@@ -127,7 +127,7 @@ class AdminController extends SamayGnawController
 			$result = $stmt->fetch(PDO::FETCH_ASSOC);
 
 			if ($result && $result !== null) {
-				echo json_encode($result);
+				parent::notify("s", "RFS", "Request's data Fetched Successfully", json_encode($result));
 			} else {
 				parent::notify("s", "NRF", "No Request Found for the given id : The query returned an empty result");
 			}
@@ -146,10 +146,10 @@ class AdminController extends SamayGnawController
 
 			$stmt->execute();
 
-			$results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+			$result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-			if ($results && $results !== null) {
-				echo json_encode($results);
+			if ($result && $result !== null) {
+				parent::notify("s", "SFS", "Saloons' data Fetched Successfully", json_encode($result));
 			} else {
 				parent::notify("s", "NSF", "No Saloons Found : The query returned an empty result");
 			}
@@ -172,7 +172,7 @@ class AdminController extends SamayGnawController
 			$result = $stmt->fetch(PDO::FETCH_ASSOC);
 
 			if ($result && $result !== null) {
-				echo json_encode($result);
+				parent::notify("s", "SFS", "Saloon data Fetched Successfully", json_encode($result));
 			} else {
 				parent::notify("s", "NSF", "No Saloon Found for the given sgi : The query returned an empty result");
 			}
@@ -191,10 +191,10 @@ class AdminController extends SamayGnawController
 
 			$stmt->execute();
 
-			$results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+			$result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-			if ($results && $results !== null) {
-				echo json_encode($results);
+			if ($result && $result !== null) {
+				parent::notify("s", "CFS", "Clients' data Fetched Successfully", json_encode($result));
 			} else {
 				parent::notify("s", "NCF", "No Clients Found : The query returned an empty result");
 			}
@@ -216,7 +216,7 @@ class AdminController extends SamayGnawController
 			$result = $stmt->fetch(PDO::FETCH_ASSOC);
 
 			if ($result && $result !== null) {
-				echo json_encode($result);
+				parent::notify("s", "CFS", "Client data Fetched Successfully", json_encode($result));
 			} else {
 				self::notify("s", "NCF", "No Client Found for the given sgi : The query returned an empty result");
 			}
@@ -413,16 +413,16 @@ class SalonController extends SamayGnawController // thanks to heritage, parent'
 
 		try {
 
-			$stmt = parent::$_sqlCon->prepare($query); // to fix !!
+			$stmt = parent::$_sqlCon->prepare($query);
 
 			$stmt->execute();
 
 			$result = $stmt->fetch(PDO::FETCH_ASSOC);
 
 			if ($result && $result !== null) {
-				echo json_encode($result);
+				parent::notify("s", "CFS", "Client data Fetched Successfully", json_encode($result));
 			} else {
-				parent::notify("s", "NMF", "No measurements found for this client");
+				parent::notify("s", "NDF", "No Data Found for this client");
 			}
 		} catch (Exception $e) {
 			parent::notify("uerr", "UNEX", "Due to an unexpected error, the operation can not proceed");
@@ -443,7 +443,7 @@ class SalonController extends SamayGnawController // thanks to heritage, parent'
 			$result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 			if ($result && $result !== null) {
-				echo json_encode($result);
+				parent::notify("s", "GFS", "Gnaws Fetched Successfully", json_encode($result));
 			} else {
 				parent::notify("s", "NGF", "No Gnaw Found for the given sgi : The query returned an empty result");
 			}
@@ -538,7 +538,7 @@ class ClientController extends SamayGnawController
 			$result = $stmt->fetch(PDO::FETCH_ASSOC);
 
 			if ($result && $result !== null) {
-				echo json_encode($result);
+				parent::notify("s", "MFS", "Measurements Fetched Successfully", $result);
 			} else {
 				parent::notify("s", "NMF", "No measurements found for this client");
 			}

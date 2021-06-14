@@ -6,10 +6,10 @@ header('Access-Control-Allow-Headers: *');
 header('Access-Control-Allow-Methods: *');
 
 
-include '../../config/controller.php';
+include '../../../config/controller.php';
 
 // Get the sgi passed in the url 
-$sgi = isset($_GET['sgi']) ? $_GET['sgi'] : die('ERROR: No SGI provided');
+$sgi = isset($_GET['sgi']) ? $_GET['sgi'] : die(json_encode(array('ERROR' => 'No Client SGI provided')));
 
 
 try {
