@@ -347,7 +347,7 @@ class SalonController extends SamayGnawController // thanks to heritage, parent'
 	public function login($credentials)
 	{
 
-		$_login = $credentials->login;
+		$_login = $credentials->sgi;
 		$_pwd = $credentials->pwd;
 
 		$query = "SELECT id, shadow FROM users WHERE login = '$_login'";
@@ -451,7 +451,7 @@ class SalonController extends SamayGnawController // thanks to heritage, parent'
 	public function viewGnaws($sgi)
 	{
 
-		$query = "SELECT prop, dateC, dateL, prix, avance, etat, type FROM gnaws WHERE salon = '$sgi'";
+		$query = "SELECT sgi, prop, dateC, dateL, prix, avance, etat, type FROM gnaws WHERE salon = '$sgi'";
 
 		try {
 
@@ -620,7 +620,7 @@ class ClientController extends SamayGnawController
 				parent::notify("s", "GFS", "Gnaws Fetched Successfully", $gnawsData);
 
 			} else {
-				parent::notify("s", "NGF", "No Gnaw Found for the given sgi : The query returned an empty result");
+				parent::notify("s", "NGF", "No Gnaw Found for the given client : The query returned an empty result");
 			}
 		} catch (Exception $e) {
 			parent::notify("uerr", "UNEX", "Due to an unexpected error, the operation can not proceed");
