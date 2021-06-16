@@ -86,6 +86,25 @@ class SamayGnawController
 
 		return $sgi;
 	}
+
+	protected function getSaloonName($sgi)
+	{
+
+		$query = "SELECT nom FROM salons WHERE sgi = '$sgi'";
+
+		try {
+
+			$stmt = self::$_sqlCon->prepare($query);
+
+			$stmt->execute();
+
+			$result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+			return $result['nom'];
+		} catch (Exception $e) {
+			self::notify("uerr", "UNEX", "Due to an unexpected error, the SGI creation failed");
+		}
+	}
 }
 
 class AdminController extends SamayGnawController
@@ -328,7 +347,7 @@ class SalonController extends SamayGnawController // thanks to heritage, parent'
 	public function login($credentials)
 	{
 
-		$_login = $credentials->login;
+		$_login = $credentials->sgi;
 		$_pwd = $credentials->pwd;
 
 		$query = "SELECT id, shadow FROM users WHERE login = '$_login'";
@@ -432,7 +451,7 @@ class SalonController extends SamayGnawController // thanks to heritage, parent'
 	public function viewGnaws($sgi)
 	{
 
-		$query = "SELECT prop, dateC, dateL, prix, avance, etat, type FROM gnaws WHERE salon = '$sgi'";
+		$query = "SELECT sgi, prop, dateC, dateL, prix, avance, etat, type FROM gnaws WHERE salon = '$sgi'";
 
 		try {
 
@@ -521,7 +540,7 @@ class ClientController extends SamayGnawController
 		$this->_sgi = $sgi;
 	}
 
-	public function measurements()
+	public function viewMeasurements()
 	{
 
 		$query = "SELECT  
@@ -541,6 +560,67 @@ class ClientController extends SamayGnawController
 				parent::notify("s", "MFS", "Measurements Fetched Successfully", $result);
 			} else {
 				parent::notify("s", "NMF", "No measurements found for this client");
+			}
+		} catch (Exception $e) {
+			parent::notify("uerr", "UNEX", "Due to an unexpected error, the operation can not proceed");
+		}
+	}
+
+	public function viewGnaws()
+	{
+
+		$query = "SELECT sgi, salon, dateC, dateL, prix, avance, etat, type FROM gnaws WHERE prop = '$this->_sgi'";
+
+		try {
+
+			$stmt = parent::$_sqlCon->prepare($query);
+
+			$stmt->execute();
+
+			$result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+			if ($result && $result !== null) {
+
+				$gnawsSGIs = array();
+				$saloonNames = array();
+				$datesC = array();
+				$datesL = array();
+				$prices = array();
+				$avances = array();
+				$etats = array();
+				$types = array();
+
+				foreach ($result as $r) { // since we don't want to return the sgi of the saloons to the user
+					array_push($saloonNames, parent::getSaloonName($r['salon'])); // we get their names first
+
+					// Then we separately get each attribut of gnaws, cause they can be different
+					array_push($gnawsSGIs, $r['sgi']);
+					array_push($datesC, $r['dateC']);
+					array_push($datesL, $r['dateL']);
+					array_push($prices, $r['prix']);
+					array_push($avances, $r['avance']);
+					array_push($etats, $r['etat']);
+					array_push($types, $r['type']);
+				}
+
+				// then build a new array to return to the user
+				$gnawsData = json_encode(
+					array(
+						"sgis" => $gnawsSGIs,
+						'salons' => $saloonNames,
+						'datesC' => $datesC,
+						'datesL' => $datesL,
+						'prix' => $prices,
+						'avances' => $avances,
+						'etats' => $etats,
+						'types' => $types
+					)
+				);
+
+				parent::notify("s", "GFS", "Gnaws Fetched Successfully", $gnawsData);
+
+			} else {
+				parent::notify("s", "NGF", "No Gnaw Found for the given client : The query returned an empty result");
 			}
 		} catch (Exception $e) {
 			parent::notify("uerr", "UNEX", "Due to an unexpected error, the operation can not proceed");
