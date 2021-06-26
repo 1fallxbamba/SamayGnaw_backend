@@ -382,7 +382,7 @@ class SalonController extends SamayGnawController // thanks to heritage, parent'
 
 		$_lastName = $clientData->lastName;
 		$_firstName = $clientData->firstName;
-		$_phone = $clientData->phone;
+		$_phone = (int)$clientData->phone;
 		$_gender = $clientData->gender;
 
 		$sgi = parent::generateSGI("SGC", $_phone);
