@@ -477,7 +477,9 @@ class SalonController extends SamayGnawController // thanks to heritage, parent'
 		$sgi = parent::generateSGI("SGG");
 		$_prop = $gnawData->prop;
 		$_saloon = $gnawData->saloon;
-		$_dateL = $gnawData->dateL;
+
+		$_dateL = substr(str_replace('T', ' ', $gnawData->dateL), 0, 19); // format the date to an MySql understandable format
+
 		$_price = $gnawData->price;
 		$_avance = $gnawData->avance;
 		$_type = $gnawData->type;
