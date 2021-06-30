@@ -423,13 +423,13 @@ class SalonController extends SamayGnawController // thanks to heritage, parent'
 		}
 	}
 
-	public function viewClient($sgi)
+	public function viewClient($clientSGI)
 	{
 
 		$query = "SELECT  
 		nom, prenom, cou, epaule, poitrine, ceinture, tourBras, tourPoignet, longManche, 
 		longPant, longTaille, longCaftan, tourCuisse, tourCheville  
-		FROM clients WHERE sgi = '$sgi'";
+		FROM clients WHERE sgi = '$clientSGI'";
 
 		try {
 
@@ -449,10 +449,10 @@ class SalonController extends SamayGnawController // thanks to heritage, parent'
 		}
 	}
 
-	public function viewGnaws($sgi)
+	public function viewClients($saloonSGI)
 	{
 
-		$query = "SELECT sgi, prop, dateC, dateL, prix, avance, etat, type FROM gnaws WHERE salon = '$sgi'";
+		$query = "SELECT sgi, nom, prenom, tel FROM clients WHERE salon = '$saloonSGI'";
 
 		try {
 
@@ -463,9 +463,9 @@ class SalonController extends SamayGnawController // thanks to heritage, parent'
 			$result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 			if ($result && $result !== null) {
-				parent::notify("s", "GFS", "Gnaws Fetched Successfully", json_encode($result));
+				parent::notify("s", "CFS", "Clients Fetched Successfully", json_encode($result));
 			} else {
-				parent::notify("s", "NGF", "No Gnaw Found for the given sgi : The query returned an empty result");
+				parent::notify("s", "NCF", "No Client Found for the given sgi : The query returned an empty result");
 			}
 		} catch (Exception $e) {
 			parent::notify("uerr", "UNEX", "Due to an unexpected error, the operation can not proceed");
@@ -495,6 +495,29 @@ class SalonController extends SamayGnawController // thanks to heritage, parent'
 				parent::notify("s", "NGSA", "The New Gnaw has been Successfully Added", $sgi);
 			} else {
 				parent::notify("uerr", "UNEX", "An unexpected error has occured, the gnaw could not be added !");
+			}
+		} catch (Exception $e) {
+			parent::notify("uerr", "UNEX", "Due to an unexpected error, the operation can not proceed");
+		}
+	}
+
+	public function viewGnaws($sgi)
+	{
+
+		$query = "SELECT sgi, prop, dateC, dateL, prix, avance, etat, type FROM gnaws WHERE salon = '$sgi'";
+
+		try {
+
+			$stmt = parent::$_sqlCon->prepare($query);
+
+			$stmt->execute();
+
+			$result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+			if ($result && $result !== null) {
+				parent::notify("s", "GFS", "Gnaws Fetched Successfully", json_encode($result));
+			} else {
+				parent::notify("s", "NGF", "No Gnaw Found for the given sgi : The query returned an empty result");
 			}
 		} catch (Exception $e) {
 			parent::notify("uerr", "UNEX", "Due to an unexpected error, the operation can not proceed");
