@@ -380,6 +380,7 @@ class SalonController extends SamayGnawController // thanks to heritage, parent'
 	public function addClient($clientData)
 	{
 
+		$_saloonSGI = $clientData->saloon;
 		$_lastName = $clientData->lastName;
 		$_firstName = $clientData->firstName;
 		$_phone = (int)$clientData->phone;
@@ -402,9 +403,9 @@ class SalonController extends SamayGnawController // thanks to heritage, parent'
 		$_tourCheville = $clientData->tourCheville;
 
 		$query = "INSERT INTO 
-		clients(sgi, nom, prenom, tel, genre, cou, epaule, poitrine, ceinture, tourBras, 
+		clients(sgi, salon, nom, prenom, tel, genre, cou, epaule, poitrine, ceinture, tourBras, 
 		tourPoignet, longManche, longPant, longTaille, longCaftan, tourCuisse, tourCheville)
-		VALUES('$sgi', '$_lastName', '$_firstName', $_phone, '$_gender', $_cou, $_epaule, $_poitrine, 
+		VALUES('$sgi', '$_saloonSGI', '$_lastName', '$_firstName', $_phone, '$_gender', $_cou, $_epaule, $_poitrine, 
 		$_ceinture, $_tourBras, $_tourPoignet, $_longManche, $_longPant, $_longTaille, $_longCaftan, $_tourCuisse, $_tourCheville)";
 
 		try {
@@ -422,13 +423,13 @@ class SalonController extends SamayGnawController // thanks to heritage, parent'
 		}
 	}
 
-	public function viewClient($sgi)
+	public function viewClient($clientSGI)
 	{
 
 		$query = "SELECT  
 		nom, prenom, cou, epaule, poitrine, ceinture, tourBras, tourPoignet, longManche, 
 		longPant, longTaille, longCaftan, tourCuisse, tourCheville  
-		FROM clients WHERE sgi = '$sgi'";
+		FROM clients WHERE sgi = '$clientSGI'";
 
 		try {
 
@@ -442,6 +443,58 @@ class SalonController extends SamayGnawController // thanks to heritage, parent'
 				parent::notify("s", "CFS", "Client data Fetched Successfully", json_encode($result));
 			} else {
 				parent::notify("s", "NDF", "No Data Found for this client");
+			}
+		} catch (Exception $e) {
+			parent::notify("uerr", "UNEX", "Due to an unexpected error, the operation can not proceed");
+		}
+	}
+
+	public function viewClients($saloonSGI)
+	{
+
+		$query = "SELECT sgi, nom, prenom, tel FROM clients WHERE salon = '$saloonSGI'";
+
+		try {
+
+			$stmt = parent::$_sqlCon->prepare($query);
+
+			$stmt->execute();
+
+			$result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+			if ($result && $result !== null) {
+				parent::notify("s", "CFS", "Clients Fetched Successfully", json_encode($result));
+			} else {
+				parent::notify("s", "NCF", "No Client Found for the given sgi : The query returned an empty result");
+			}
+		} catch (Exception $e) {
+			parent::notify("uerr", "UNEX", "Due to an unexpected error, the operation can not proceed");
+		}
+	}
+
+	public function addGnaw($gnawData)
+	{
+		$sgi = parent::generateSGI("SGG");
+		$_prop = $gnawData->prop;
+		$_saloon = $gnawData->saloon;
+
+		$_dateL = substr(str_replace('T', ' ', $gnawData->dateL), 0, 19); // format the date to a MySql understandable format
+
+		$_price = $gnawData->price;
+		$_avance = $gnawData->avance;
+		$_type = $gnawData->type;
+
+		$query = "INSERT INTO gnaws(sgi, prop, salon, dateL, prix, avance, type ) 
+		VALUES('$sgi','$_prop', '$_saloon', '$_dateL', $_price, $_avance, '$_type')";
+
+		try {
+
+			$stmt = parent::$_sqlCon->prepare($query);
+
+			if ($stmt->execute() && $stmt->rowCount() != 0) {
+				parent::notify("s", "NGSA", "The New Gnaw has been Successfully Added", $sgi);
+			} else {
+				parent::notify("uerr", "UNEX", "An unexpected error has occured, the gnaw could not be added !");
 			}
 		} catch (Exception $e) {
 			parent::notify("uerr", "UNEX", "Due to an unexpected error, the operation can not proceed");
@@ -465,36 +518,6 @@ class SalonController extends SamayGnawController // thanks to heritage, parent'
 				parent::notify("s", "GFS", "Gnaws Fetched Successfully", json_encode($result));
 			} else {
 				parent::notify("s", "NGF", "No Gnaw Found for the given sgi : The query returned an empty result");
-			}
-		} catch (Exception $e) {
-			parent::notify("uerr", "UNEX", "Due to an unexpected error, the operation can not proceed");
-		}
-	}
-
-	public function addGnaw($gnawData)
-	{
-		//informations
-		$sgi = parent::generateSGI("SGG");
-		$_prop = $gnawData->prop;
-		$_saloon = $gnawData->saloon;
-
-		$_dateL = substr(str_replace('T', ' ', $gnawData->dateL), 0, 19); // format the date to an MySql understandable format
-
-		$_price = $gnawData->price;
-		$_avance = $gnawData->avance;
-		$_type = $gnawData->type;
-
-		$query = "INSERT INTO gnaws(sgi, prop, salon, dateL, prix, avance, type ) 
-		VALUES('$sgi','$_prop', '$_saloon', '$_dateL', $_price, $_avance, '$_type')";
-
-		try {
-
-			$stmt = parent::$_sqlCon->prepare($query);
-
-			if ($stmt->execute() && $stmt->rowCount() != 0) {
-				parent::notify("s", "NGSA", "The New Gnaw has been Successfully Added", $sgi);
-			} else {
-				parent::notify("uerr", "UNEX", "An unexpected error has occured, the gnaw could not be added !");
 			}
 		} catch (Exception $e) {
 			parent::notify("uerr", "UNEX", "Due to an unexpected error, the operation can not proceed");
