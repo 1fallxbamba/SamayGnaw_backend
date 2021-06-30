@@ -380,6 +380,7 @@ class SalonController extends SamayGnawController // thanks to heritage, parent'
 	public function addClient($clientData)
 	{
 
+		$_saloonSGI = $clientData->saloon;
 		$_lastName = $clientData->lastName;
 		$_firstName = $clientData->firstName;
 		$_phone = (int)$clientData->phone;
@@ -402,9 +403,9 @@ class SalonController extends SamayGnawController // thanks to heritage, parent'
 		$_tourCheville = $clientData->tourCheville;
 
 		$query = "INSERT INTO 
-		clients(sgi, nom, prenom, tel, genre, cou, epaule, poitrine, ceinture, tourBras, 
+		clients(sgi, salon, nom, prenom, tel, genre, cou, epaule, poitrine, ceinture, tourBras, 
 		tourPoignet, longManche, longPant, longTaille, longCaftan, tourCuisse, tourCheville)
-		VALUES('$sgi', '$_lastName', '$_firstName', $_phone, '$_gender', $_cou, $_epaule, $_poitrine, 
+		VALUES('$sgi', '$_saloonSGI', '$_lastName', '$_firstName', $_phone, '$_gender', $_cou, $_epaule, $_poitrine, 
 		$_ceinture, $_tourBras, $_tourPoignet, $_longManche, $_longPant, $_longTaille, $_longCaftan, $_tourCuisse, $_tourCheville)";
 
 		try {
@@ -473,12 +474,11 @@ class SalonController extends SamayGnawController // thanks to heritage, parent'
 
 	public function addGnaw($gnawData)
 	{
-		//informations
 		$sgi = parent::generateSGI("SGG");
 		$_prop = $gnawData->prop;
 		$_saloon = $gnawData->saloon;
 
-		$_dateL = substr(str_replace('T', ' ', $gnawData->dateL), 0, 19); // format the date to an MySql understandable format
+		$_dateL = substr(str_replace('T', ' ', $gnawData->dateL), 0, 19); // format the date to a MySql understandable format
 
 		$_price = $gnawData->price;
 		$_avance = $gnawData->avance;
