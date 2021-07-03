@@ -87,26 +87,25 @@ class SamayGnawController
 		return $sgi;
 	}
 
-	// protected function getSaloonName($sgi)
-	// {
+	protected function fetchSaloonName($sgi)
+	{
+		$query = "SELECT nom FROM salons WHERE sgi = '$sgi'";
 
-	// 	$query = "SELECT nom FROM salons WHERE sgi = '$sgi'";
+		try {
 
-	// 	try {
+			$stmt = self::$_sqlCon->prepare($query);
 
-	// 		$stmt = self::$_sqlCon->prepare($query);
+			$stmt->execute();
 
-	// 		$stmt->execute();
+			$result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-	// 		$result = $stmt->fetch(PDO::FETCH_ASSOC);
+			return $result['nom'];
+		} catch (Exception $e) {
+			self::notify("uerr", "UNEX", "Due to an unexpected error, the operation failded");
+		}
+	}
 
-	// 		return $result['nom'];
-	// 	} catch (Exception $e) {
-	// 		self::notify("uerr", "UNEX", "Due to an unexpected error, the operation failded");
-	// 	}
-	// }
-
-	protected function getClientName($sgi)
+	protected function fetchClientName($sgi)
 	{
 		$query = "SELECT prenom, nom FROM clients WHERE sgi = '$sgi'";
 
@@ -441,7 +440,7 @@ class SalonController extends SamayGnawController // thanks to heritage, parent'
 		}
 	}
 
-	public function viewClient($clientSGI)
+	public function fetchClient($clientSGI)
 	{
 
 		$query = "SELECT  
@@ -467,10 +466,10 @@ class SalonController extends SamayGnawController // thanks to heritage, parent'
 		}
 	}
 
-	public function viewClients($saloonSGI)
+	public function fetchClients($sgi)
 	{
 
-		$query = "SELECT sgi, nom, prenom, tel FROM clients WHERE salon = '$saloonSGI'";
+		$query = "SELECT sgi, nom, prenom, tel FROM clients WHERE salon = '$sgi'";
 
 		try {
 
@@ -519,7 +518,7 @@ class SalonController extends SamayGnawController // thanks to heritage, parent'
 		}
 	}
 
-	public function viewGnaws($sgi)
+	public function fetchGnaws($sgi, $forFetch = false)
 	{
 
 		$query = "SELECT sgi, prop, dateC, dateL, prix, avance, etat, type FROM gnaws WHERE salon = '$sgi'";
@@ -537,7 +536,7 @@ class SalonController extends SamayGnawController // thanks to heritage, parent'
 				$clientNames = array();
 
 				foreach ($result as $r) {
-					array_push($clientNames, parent::getClientName($r['prop']));
+					array_push($clientNames, parent::fetchClientName($r['prop']));
 				}
 
 				$gnawData = json_encode(
@@ -547,9 +546,17 @@ class SalonController extends SamayGnawController // thanks to heritage, parent'
 					)
 				);
 
-				parent::notify("s", "GFS", "Gnaws Fetched Successfully", $gnawData);
+				if ($forFetch) {
+					return $result;
+				} else {
+					parent::notify("s", "GFS", "Gnaws Fetched Successfully", $gnawData);
+				}
 			} else {
-				parent::notify("s", "NGF", "No Gnaw Found for the given sgi : The query returned an empty result");
+				if ($forFetch) {
+					return array();
+				} else {
+					parent::notify("s", "NGF", "No Gnaw Found for the given sgi : The query returned an empty result");
+				}
 			}
 		} catch (Exception $e) {
 			parent::notify("uerr", "UNEX", "Due to an unexpected error, the operation can not proceed");
@@ -582,6 +589,33 @@ class SalonController extends SamayGnawController // thanks to heritage, parent'
 		} catch (Exception $e) {
 			parent::notify("uerr", "UNEX", "Due to an unexpected error, the operation can not proceed");
 		}
+	}
+
+	public function fetchInfo($sgi)
+	{
+		$name = parent::fetchSaloonName($sgi);
+
+		$gnaws = $this->fetchGnaws($sgi, true);
+
+		$numberOfGnaws = count($gnaws);
+		$ongoingGnaws = 0;
+		$finishedGnaws = 0;
+
+		foreach ($gnaws as $g) {
+			$ongoingGnaws += $g['etat'] == 'En cours' || $g['etat'] == 'Attente paiement';
+			$finishedGnaws += $g['etat'] == 'Terminé';
+		}
+
+		$saloonInfo = json_encode(
+			array(
+				'NAME' => $name,
+				'GNAWS' => $numberOfGnaws,
+				'ONGOING' => $ongoingGnaws,
+				'FINISHED' => $finishedGnaws
+			)
+		);
+
+		echo $saloonInfo;
 	}
 }
 
@@ -623,7 +657,7 @@ class ClientController extends SamayGnawController
 		}
 	}
 
-	public function viewGnaws()
+	public function fetchGnaws()
 	{
 		$query = "SELECT sgi, dateC, dateL, prix, avance, etat, type FROM gnaws WHERE prop = '$this->_sgi'";
 
