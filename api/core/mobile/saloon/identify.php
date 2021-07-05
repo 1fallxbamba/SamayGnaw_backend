@@ -12,7 +12,7 @@ $saloonSGI = isset($_GET['sgi']) ? $_GET['sgi'] : die(json_encode(array('ERROR' 
 
 try {
 	$salon = new SalonController();
-	$salon->fetchGnaws($saloonSGI);
+	$salon->verifyIdentify($saloonSGI);
 } catch (Exception $e) {
 	SamayGnawController::notify("uerr", "UNEX", "Due to an unexpected error the requested operation can not be processed");
 }

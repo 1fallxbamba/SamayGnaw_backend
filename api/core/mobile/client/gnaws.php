@@ -16,7 +16,7 @@ try {
 
 	$client = new ClientController($sgi);
 
-	$client->viewGnaws();
+	$client->fetchGnaws();
 
 } catch (Exception $e) {
 	SamayGnawController::notify("uerr", "UNEX", "Due to an unexpected error the requested operation can not be processed");

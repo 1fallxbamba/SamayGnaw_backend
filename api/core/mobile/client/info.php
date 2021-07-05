@@ -8,13 +8,19 @@ header('Access-Control-Allow-Methods: *');
 
 include '../../../config/controller.php';
 
-$saloonSGI = isset($_GET['sgi']) ? $_GET['sgi'] : die(json_encode(array('ERROR' => 'No Saloon SGI provided')));
+// Get the sgi passed in the url 
+$sgi = isset($_GET['sgi']) ? $_GET['sgi'] : die(json_encode(array('ERROR' => 'No Client SGI provided')));
+
 
 try {
-	$salon = new SalonController();
-	$salon->fetchGnaws($saloonSGI);
+
+	$client = new ClientController($sgi);
+
+	$client->fetchInfo();
+
 } catch (Exception $e) {
 	SamayGnawController::notify("uerr", "UNEX", "Due to an unexpected error the requested operation can not be processed");
 }
+
 
 ?>
