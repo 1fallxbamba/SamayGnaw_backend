@@ -361,6 +361,28 @@ class SalonController extends SamayGnawController // thanks to heritage, parent'
 		}
 	}
 
+	public function verifyIdentify($sgi)
+	{
+		$query = "SELECT id FROM salons WHERE sgi = '$sgi'";
+
+		try {
+
+			$stmt = parent::$_sqlCon->prepare($query);
+
+			$stmt->execute();
+
+			$result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+			if ($stmt->rowCount() === 0) {
+				parent::notify("err", "SDNE", "Saloon Does Not Exist : the given sgi does not exist in the records.");
+			} else {
+				parent::notify("s", "SSA", "The Saloon is Successfully Identified");
+			}
+		} catch (Exception $e) {
+			parent::notify("uerr", "UNEX", "Due to an unexpected error, the operation can not proceed");
+		}
+	}
+
 	public function login($credentials)
 	{
 
@@ -382,7 +404,7 @@ class SalonController extends SamayGnawController // thanks to heritage, parent'
 				$fetchedPwd = $result['shadow'];
 
 				if (password_verify($_pwd, $fetchedPwd)) { // then check if the password is correct
-					parent::notify("s", "USA", "The User is Successfully Authentified");
+					parent::notify("s", "USA", "The User is Successfully Authenticated");
 				} else {
 					parent::notify("err", "WPWD", "Wrong Password : The entered password is incorrect ");
 				}
@@ -394,7 +416,7 @@ class SalonController extends SamayGnawController // thanks to heritage, parent'
 		}
 	}
 
-	public function addClient($clientData) // check if the client exists
+	public function addClient($clientData) // check if the client exists (i don't know a way of doing that right now, i'll keep thinking :!)
 	{
 
 		$_saloonSGI = $clientData->saloon;
@@ -489,7 +511,7 @@ class SalonController extends SamayGnawController // thanks to heritage, parent'
 		}
 	}
 
-	public function addGnaw($gnawData) // check if the client exists
+	public function addGnaw($gnawData)
 	{
 		$sgi = parent::generateSGI("SGG");
 		$_prop = $gnawData->prop;
@@ -630,6 +652,28 @@ class ClientController extends SamayGnawController
 	{
 		parent::__construct(); // here we need to explicitly called the parent constructor cause we declared a constructor for the child
 		$this->_sgi = $sgi;
+	}
+
+	public function verifyIdentify()
+	{
+		$query = "SELECT id FROM clients WHERE sgi = '$this->_sgi'";
+
+		try {
+
+			$stmt = parent::$_sqlCon->prepare($query);
+
+			$stmt->execute();
+
+			$result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+			if ($stmt->rowCount() === 0) {
+				parent::notify("err", "CDNE", "Client Does Not Exist : the given sgi does not exist in the records.");
+			} else {
+				parent::notify("s", "CSA", "The Client is Successfully Identified");
+			}
+		} catch (Exception $e) {
+			parent::notify("uerr", "UNEX", "Due to an unexpected error, the operation can not proceed");
+		}
 	}
 
 	public function viewMeasurements()
