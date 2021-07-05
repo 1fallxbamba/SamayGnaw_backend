@@ -87,9 +87,9 @@ class SamayGnawController
 		return $sgi;
 	}
 
-	protected function fetchSaloonName($sgi)
+	protected function fetchSaloonNameAndPhone($sgi)
 	{
-		$query = "SELECT nom FROM salons WHERE sgi = '$sgi'";
+		$query = "SELECT nom, tel FROM salons WHERE sgi = '$sgi'";
 
 		try {
 
@@ -99,7 +99,7 @@ class SamayGnawController
 
 			$result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-			return $result['nom'];
+			return $result;
 		} catch (Exception $e) {
 			self::notify("uerr", "UNEX", "Due to an unexpected error, the operation failded");
 		}
@@ -593,7 +593,8 @@ class SalonController extends SamayGnawController // thanks to heritage, parent'
 
 	public function fetchInfo($sgi)
 	{
-		$name = parent::fetchSaloonName($sgi);
+		$_name = parent::fetchSaloonNameAndPhone($sgi);
+		$name = $_name['nom'];
 
 		$gnaws = $this->fetchGnaws($sgi, true);
 
@@ -677,6 +678,33 @@ class ClientController extends SamayGnawController
 		} catch (Exception $e) {
 			parent::notify("uerr", "UNEX", "Due to an unexpected error, the operation can not proceed");
 		}
+	}
+
+	public function fetchInfo()
+	{
+		$query = "SELECT salon FROM clients WHERE sgi = '$this->_sgi'";
+
+		$stmt = self::$_sqlCon->prepare($query);
+
+		$stmt->execute();
+
+		$result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+		$_saloon = parent::fetchSaloonNameAndPhone($result['salon']);
+
+		$name = parent::fetchClientName($this->_sgi);
+		$saloonName = $_saloon['nom'];
+		$saloonPhone = $_saloon['tel'];
+
+		$clientInfo = json_encode(
+			array(
+				'NAME' => $name,
+				'SALOONNAME' => $saloonName,
+				'SALOONPHONE' => $saloonPhone
+			)
+		);
+
+		echo $clientInfo;
 	}
 
 	// OLD
